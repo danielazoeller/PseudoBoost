@@ -1,0 +1,22 @@
+Package: PseudoBoost
+Title: Perform stagewise pseudo-value regression for CIF in competing risks
+    settings
+Version: 0.1
+Date: 2014-12-03
+Authors@R: person("Daniela", "Zoeller", email = "daniela.zoeller@uni-mainz.de",
+    role = c("aut", "cre"))
+Maintainer: Daniela Zoeller <daniela.zoeller@uni-mainz.de>
+Description: In a competing risk setting the CIF for the first risk are
+    calculated at a grid of time. For this values a stagewise boosting
+    algortihm is performed, whereas the variable selection is coupled between
+    time points but the estimates may differ. Consequently this allows to
+    estimate time-varying effects. Addionally pointwise confidence intervals
+    and confidence bands can be calculated.
+Depends:
+    R (>= 3.1.2)
+License: BSD_3_clause + file LICENSE
+LazyData: true
+Suggests:
+    parallel
+Imports:
+    prodlim
