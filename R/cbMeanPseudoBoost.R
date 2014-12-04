@@ -38,7 +38,7 @@ cbMeanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
   }
   
   if(is.null(switches)){
-    switches <- 100*max(which(sort(obs.time[status==1])<=switch.t))
+    switches <- 1000
   }
   
   res.mean <- meanPseudoBoost(data,xmat=xmat,times=times,stepno=stepno,maxstepno=maxstepno,nu=nu,cv=cv_est,multicore=multicore,RepMean=RepMean,switch.to=switch.to,seed.start=seed.start,trace=FALSE,switches=switches)
