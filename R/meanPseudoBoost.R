@@ -168,10 +168,18 @@ meanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=
     #       }
     #     }
     #   }else{
-    for (xindex in 1:(ncol(xmat)+1)) {
-      res.mean[[xindex]] <- apply(reslist[[xindex]],MARGIN=1,FUN=mean)
-      
+    if(RepMean>1){
+      for (xindex in 1:(ncol(xmat)+1)) {
+        res.mean[[xindex]] <- apply(reslist[[xindex]],MARGIN=1,FUN=mean)
+        
+      }
+    } else {
+      for (xindex in 1:(ncol(xmat)+1)) {
+        res.mean[[xindex]] <- reslist[[xindex]]
+        
+      }
     }
+    
   } else {
     set.seed(seed.start)
     
