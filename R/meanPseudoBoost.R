@@ -10,11 +10,11 @@
 #' @param cv A boolean value indicating if cross validation should be performed.
 #' @param multicore A boolean value indication if more than one core should be used for the cross validation (for this the parallel package is needed).
 #' @param RepMean A numeric value indicating the number of modified datasets used the estimate.
-#' @param switch.to A numeric value indicating the number of the first risk up to which the observations can be switched. It sets the value switch.t. If switch.t is specified, switch.to will be ignored.
-#' @param switch.t A numeric value indicating the time point up to which the observations can be switched. If this value is not NULL, switch.to will be ignored.
+#' @param switch.to A numeric value indicating the number of the first risk up to which the observations can be switched. It sets the value switch.t. If switch.t is specified, switch.to will be ignored. If switch.to=0, switch.t will be set to zero.
+#' @param switch.t A numeric value indicating the time point up to which the observations can be switched. If this value is not NULL, switch.to will be ignored. If switch.t=0, there will be no switching.
 #' @param seed.start A numeric value indicating the first seed value. 
 #' @param trace A boolean value indicating if additonal information should be printed out during the process.
-#' @param switches A numeric value indicating the number of switches to be made.
+#' @param switches A numeric value indicating the number of switches to be made. Setting switches=0 will suppress smoothing. If switches is NULL, 1000 switches will be performed.
 #' @return An object of type meanPseudoBoost containing the estimates and the performed boosting step number.
 #' @import prodlim
 #' @export 
@@ -34,15 +34,15 @@ meanPseudoBoost <- function(object,...){
 #' @param cv A boolean value indicating if cross validation should be performed.
 #' @param multicore A boolean value indication if more than one core should be used for the cross validation (for this the parallel package is needed).
 #' @param RepMean A numeric value indicating the number of modified datasets used the estimate.
-#' @param switch.to A numeric value indicating the number of the first risk up to which the observations can be switched. It sets the value switch.t. If switch.t is specified, switch.to will be ignored.
-#' @param switch.t A numeric value indicating the time point up to which the observations can be switched. If this value is not NULL, switch.to will be ignored.
+#' @param switch.to A numeric value indicating the number of the first risk up to which the observations can be switched. It sets the value switch.t. If switch.t is specified, switch.to will be ignored. If switch.to=0, switch.t will be set to zero.
+#' @param switch.t A numeric value indicating the time point up to which the observations can be switched. If this value is not NULL, switch.to will be ignored. If switch.t=0, there will be no switching.
 #' @param seed.start A numeric value indicating the first seed value. 
 #' @param trace A boolean value indicating if additonal information should be printed out during the process.
-#' @param switches A numeric value indicating the number of switches to be made.
+#' @param switches A numeric value indicating the number of switches to be made. Setting switches=0 will suppress smoothing. If switches is NULL, 1000 switches will be performed.
 #' @return An object of type meanPseudoBoost containing the estimates and the performed boosting step number.
 #' @import prodlim
 #' @export 
-meanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,RepMean=50,switch.to=150,switch.t=NULL,seed.start=NULL,trace=TRUE,switches = 1000,...){
+meanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,RepMean=50,switch.to=150,switch.t=NULL,seed.start=NULL,trace=TRUE,switches = NULL,...){
   require(prodlim)
   
   obs.time <- data[[1]]
@@ -66,6 +66,10 @@ meanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=
     } else{
       switch.t <- sort(obs.time[status==1])[switch.to]
     }
+  }
+  
+  if(is.null(switches)){
+    switches <- 1000
   }
   
   if(trace) cat("For smoothing the first observation times with a observation time <= ",switch.t," will be switched.\n This corresponds to switching up to the ",switch.to," observation time of the risk 1.\n")
