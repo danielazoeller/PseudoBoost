@@ -224,11 +224,21 @@ meanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=
   return(res.mean)
 }
 
-plot.meanPseudoBoost <- function(object,eval.times,est,comb=TRUE,trans=TRUE,name="results.pdf"){
+#' Plot an object of class meanPseudoBoost. Output as PDF.
+#' 
+#' @param object An object of class meanPseudoBoost created by meanPseudoBoost().
+#' @param times A numeric vector containing the evaluation times used for meanPseudoBoost.
+#' @param est A numeric vector containing the indices of the estimated to be plotted. est=c(1) will e.g. plot the estimated intercept.
+#' @param comb A boolean vector indicating if the results should be combined in one plot (comb=TRUE) or if each estimate should be plotted seperately (comb=FALSE).
+#' @param trans A boolean vecotr indicating if the results should be transformed (trans=TRUE => Plot exponential of the estimates).
+#' @param name A string value indicating the name of the resulting PDF. E.g. name="results.pdf"
+#' @return A PDF document with the name "name".
+#' @export 
+plot.meanPseudoBoost <- function(object,times,est,comb=TRUE,trans=TRUE,name="results.pdf"){
   pdf(name)
   if (comb) {
-    if(trans==TRUE){plot(0,type="n",xlab="time",ylab="coefficient",xlim=c(0,1.3*max(eval.times)),ylim=c(0,2))}
-    else{plot(0,type="n",xlab="time",ylab="coefficient",xlim=c(0,1.3*max(eval.times)),ylim=c(-2,2))}
+    if(trans==TRUE){plot(0,type="n",xlab="time",ylab="coefficient",xlim=c(0,1.3*max(times)),ylim=c(0,2))}
+    else{plot(0,type="n",xlab="time",ylab="coefficient",xlim=c(0,1.3*max(times)),ylim=c(-2,2))}
     
     if(trans==TRUE){abline(h=1, col = "lightgray")}
     else {abline(h=0, col = "lightgray")}
@@ -236,8 +246,8 @@ plot.meanPseudoBoost <- function(object,eval.times,est,comb=TRUE,trans=TRUE,name
     linetyp <- 1
     
     for (i in 1:length(est)) {
-      if(trans==TRUE){lines(eval.times,exp(object[[est[i]]]),lty=linetyp)}
-      else {lines(eval.times,object[[est[i]]],lty=linetyp)}
+      if(trans==TRUE){lines(times,exp(object[[est[i]]]),lty=linetyp)}
+      else {lines(times,object[[est[i]]],lty=linetyp)}
       linetyp <- linetyp+1
     }
     legend("topright",legend=names(as.list(object[est])),lty=seq(linetyp),bty="n")
@@ -247,8 +257,8 @@ plot.meanPseudoBoost <- function(object,eval.times,est,comb=TRUE,trans=TRUE,name
   
   else {
     for (i in 1:length(est)) {
-      if(trans==TRUE){plot(0,type="n",xlab="time",ylab="coefficient",xlim=c(0,1.3*max(eval.times)),ylim=c(0,2))}
-      else{plot(0,type="n",xlab="time",ylab="coefficient",xlim=c(0,1.3*max(eval.times)),ylim=c(-2,2))}
+      if(trans==TRUE){plot(0,type="n",xlab="time",ylab="coefficient",xlim=c(0,1.3*max(times)),ylim=c(0,2))}
+      else{plot(0,type="n",xlab="time",ylab="coefficient",xlim=c(0,1.3*max(times)),ylim=c(-2,2))}
       
       if(trans==TRUE){abline(h=1, col = "lightgray")}
       else {abline(h=0, col = "lightgray")}
@@ -256,8 +266,8 @@ plot.meanPseudoBoost <- function(object,eval.times,est,comb=TRUE,trans=TRUE,name
       linetyp=2
       
       for (j in c(1)){
-        if(trans==TRUE){lines(eval.times,exp(object[[est[i]]]),lty=min(linetyp,j))}
-        else{lines(eval.times,object[[est[i]]],lty=min(linetyp,j))}
+        if(trans==TRUE){lines(times,exp(object[[est[i]]]),lty=min(linetyp,j))}
+        else{lines(times,object[[est[i]]],lty=min(linetyp,j))}
       }
       
       if (est[i] == 1) {
