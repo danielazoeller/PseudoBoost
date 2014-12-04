@@ -24,18 +24,18 @@ meanPseudoBoost(object, ...)
 
 \item{RepMean}{A numeric value indicating the number of modified datasets used the estimate.}
 
-\item{switch.to}{A numeric value indicating the number of the first risk up to which the observations can be switched. It sets the value switch.t. If switch.t is specified, switch.to will be ignored.}
+\item{switch.to}{A numeric value indicating the number of the first risk up to which the observations can be switched. It sets the value switch.t. If switch.t is specified, switch.to will be ignored. If switch.to=0, switch.t will be set to zero.}
 
-\item{switch.t}{A numeric value indicating the time point up to which the observations can be switched. If this value is not NULL, switch.to will be ignored.}
+\item{switch.t}{A numeric value indicating the time point up to which the observations can be switched. If this value is not NULL, switch.to will be ignored. If switch.t=0, there will be no switching.}
 
 \item{seed.start}{A numeric value indicating the first seed value.}
 
 \item{trace}{A boolean value indicating if additonal information should be printed out during the process.}
 
-\item{switches}{A numeric value indicating the number of switches to be made.}
+\item{switches}{A numeric value indicating the number of switches to be made. Setting switches=0 will suppress smoothing. If switches is NULL, 1000 switches will be performed.}
 }
 \value{
-An object of type meanPseudoBoost containing the estimates and the performed boosting step number.
+An object of type meanPseudoBoost containing the estimates, the performed boosting step number and the evaluation times.
 }
 \description{
 Creates RepMean modified datasets with the help of pairwise switches of the observation times with on observation time smaller than switch.t. For these dataset the function PseudoBoost will be called seperately and the mean value is taken for each effect estimate at each considered time point.
