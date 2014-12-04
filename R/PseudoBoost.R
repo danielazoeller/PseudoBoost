@@ -11,6 +11,7 @@
 #' @param multicore A boolean value indication if more than one core should be used for the cross validation (for this the parallel package is needed).
 #' @return An object of type PseudoBoost containing the estimates and the performed boosting step number.
 #' @import parallel
+#' @import prodlim
 #' @export 
 PseudoBoost <- function(object,...){
   UseMethod("PseudoBoost",object)
@@ -29,14 +30,17 @@ PseudoBoost <- function(object,...){
 #' @param multicore A boolean value indication if more than one core should be used for the cross validation (for this the parallel package is needed).
 #' @return An object of type PseudoBoost containing the estimates and the performed boosting step number.
 #' @import parallel
+#' @import prodlim
 #' @export 
 PseudoBoost.data.frame <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,...){
+  require(prodlim)
   if(ncol(data)==2){
     data <- as.data.frame(cbind(rep(0,nrow(data)),data))
   } else if(ncol(data)!=3){
     stop("The data object must be a data.frame containing either the start times, stop times and statuses or the observed times and statuses!")
   } 
-  ymat <- PseudoCIF(data,times)
+  #ymat <- PseudoCIF(data,times)
+  ymat <- jackknife(prodlim(Hist(data[,2],data[,3]) ~ 1), times=times, cause=1)
   if (cv) cv.res <- cv.PseudoBoost(ymat,xmat,maxstepno=maxstepno,nu=nu,multicore=multicore,...)
   stepno <- cv.res$optimal.step
   res <- PseudoBoost(ymat,xmat,stepno=stepno,nu=nu,...)
@@ -58,6 +62,7 @@ PseudoBoost.data.frame <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0
 #' @param multicore A boolean value indication if more than one core should be used for the cross validation (for this the parallel package is needed).
 #' @return An object of type PseudoBoost containing the estimates and the performed boosting step number.
 #' @import parallel
+#' @import prodlim
 #' @export 
 PseudoBoost.default <- function(ymat,xmat,stepno=10,nu=0.1,trace=FALSE) {
   n <- nrow(xmat)
