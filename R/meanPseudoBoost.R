@@ -15,7 +15,7 @@
 #' @param seed.start A numeric value indicating the first seed value. 
 #' @param trace A boolean value indicating if additonal information should be printed out during the process.
 #' @param switches A numeric value indicating the number of switches to be made. Setting switches=0 will suppress smoothing. If switches is NULL, 1000 switches will be performed.
-#' @return An object of type meanPseudoBoost containing the estimates and the performed boosting step number.
+#' @return An object of type meanPseudoBoost containing the estimates, the performed boosting step number and the evaluation times.
 #' @import prodlim
 #' @export 
 meanPseudoBoost <- function(object,...){
@@ -39,7 +39,7 @@ meanPseudoBoost <- function(object,...){
 #' @param seed.start A numeric value indicating the first seed value. 
 #' @param trace A boolean value indicating if additonal information should be printed out during the process.
 #' @param switches A numeric value indicating the number of switches to be made. Setting switches=0 will suppress smoothing. If switches is NULL, 1000 switches will be performed.
-#' @return An object of type meanPseudoBoost containing the estimates and the performed boosting step number.
+#' @return An object of type meanPseudoBoost containing the estimates, the performed boosting step number and the evaluation times.
 #' @import prodlim
 #' @export 
 meanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,RepMean=50,switch.to=150,switch.t=NULL,seed.start=NULL,trace=TRUE,switches = NULL,...){
@@ -220,6 +220,9 @@ meanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=
   
   names(res.mean) <- rescinames
   
+  res.mean[[xindex+2]] <- times
+  names(res.mean)[xindex+2] <- "evaluationTimes"
+  
   class(res.mean) <- "meanPseudoBoost"
   return(res.mean)
 }
@@ -227,15 +230,15 @@ meanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=
 #' Plot an object of class meanPseudoBoost. Output as PDF.
 #' 
 #' @param object An object of class meanPseudoBoost created by meanPseudoBoost().
-#' @param times A numeric vector containing the evaluation times used for meanPseudoBoost.
 #' @param est A numeric vector containing the indices of the estimated to be plotted. est=c(1) will e.g. plot the estimated intercept.
 #' @param comb A boolean vector indicating if the results should be combined in one plot (comb=TRUE) or if each estimate should be plotted seperately (comb=FALSE).
 #' @param trans A boolean vecotr indicating if the results should be transformed (trans=TRUE => Plot exponential of the estimates).
 #' @param name A string value indicating the name of the resulting PDF. E.g. name="results.pdf"
 #' @return A PDF document with the name "name".
 #' @export 
-plot.meanPseudoBoost <- function(object,times,est,comb=TRUE,trans=TRUE,name="results.pdf"){
+plot.meanPseudoBoost <- function(object,est,comb=TRUE,trans=TRUE,name="results.pdf"){
   pdf(name)
+  times <- object$evaluationTimes
   if (comb) {
     if(trans==TRUE){plot(0,type="n",xlab="time",ylab="coefficient",xlim=c(0,1.3*max(times)),ylim=c(0,2))}
     else{plot(0,type="n",xlab="time",ylab="coefficient",xlim=c(0,1.3*max(times)),ylim=c(-2,2))}
