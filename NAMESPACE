@@ -2,5 +2,8 @@
 
 S3method(PseudoBoost,data.frame)
 S3method(PseudoBoost,default)
+S3method(meanPseudoBoost,default)
 export(PseudoBoost)
+export(meanPseudoBoost)
 import(parallel)
+import(prodlim)

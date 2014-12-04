@@ -7,7 +7,7 @@
   maxstepno = 100, nu = 0.1, cv = TRUE, multicore = FALSE, ...)
 }
 \arguments{
-\item{data}{A data.frame containing (start and stop time or observation times) AND status}
+\item{data}{A data.frame containing observation times AND status}
 
 \item{xmat}{A numeric matrix containing the covariate values for all patients.}
 

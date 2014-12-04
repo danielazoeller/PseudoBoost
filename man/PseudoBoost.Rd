@@ -6,7 +6,7 @@
 PseudoBoost(object, ...)
 }
 \arguments{
-\item{object}{A data.frame containing (start and stop time or observation times) AND status or a numeric matrix containing the pseudo-values for the CIF for the risk 1}
+\item{object}{A data.frame containing observation times AND statuses or a numeric matrix containing the pseudo-values for the CIF for the risk 1}
 
 \item{xmat}{A numeric matrix containing the covariate values for all patients.}
 

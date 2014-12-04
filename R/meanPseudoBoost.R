@@ -1,7 +1,47 @@
+#' Perform smoothed stagewise pseudo-value regression for the first risk in a competing risk setting
+#' 
+#' Creates RepMean modified datasets with the help of pairwise switches of the observation times with on observation time smaller than switch.t. For these dataset the function PseudoBoost will be called seperately and the mean value is taken for each effect estimate at each considered time point.
+#' @param data A data.frame containing observation times AND statuses
+#' @param xmat A numeric matrix containing the covariate values for all patients.
+#' @param times A numeric vector containing the evaluation times.
+#' @param stepno A numeric value containing the number of boosting steps to be performed. If you use cross validation (cv=TRUE), this parameter will be ignored.
+#' @param maxstepno A numeric value containing the maximal number of boosting steps considered during the cross validation (only used if cv=TRUE).
+#' @param nu A numeric value between 0 and 1, the shrinkage parameter for the stagewise regression algorithm. Setting it to values such as nu=0.1 avoids overfitting in early steps.
+#' @param cv A boolean value indicating if cross validation should be performed.
+#' @param multicore A boolean value indication if more than one core should be used for the cross validation (for this the parallel package is needed).
+#' @param RepMean A numeric value indicating the number of modified datasets used the estimate.
+#' @param switch.to A numeric value indicating the number of the first risk up to which the observations can be switched. It sets the value switch.t. If switch.t is specified, switch.to will be ignored.
+#' @param switch.t A numeric value indicating the time point up to which the observations can be switched. If this value is not NULL, switch.to will be ignored.
+#' @param seed.start A numeric value indicating the first seed value. 
+#' @param trace A boolean value indicating if additonal information should be printed out during the process.
+#' @param switches A numeric value indicating the number of switches to be made.
+#' @return An object of type meanPseudoBoost containing the estimates and the performed boosting step number.
+#' @import prodlim
+#' @export 
 meanPseudoBoost <- function(object,...){
   UseMethod("meanPseudoBoost",object)
 }
 
+#' Perform smoothed stagewise pseudo-value regression for the first risk in a competing risk setting
+#' 
+#' Creates RepMean modified datasets with the help of pairwise switches of the observation times with on observation time smaller than switch.t. For these dataset the function PseudoBoost will be called seperately and the mean value is taken for each effect estimate at each considered time point.
+#' @param data A data.frame containing observation times AND statuses
+#' @param xmat A numeric matrix containing the covariate values for all patients.
+#' @param times A numeric vector containing the evaluation times.
+#' @param stepno A numeric value containing the number of boosting steps to be performed. If you use cross validation (cv=TRUE), this parameter will be ignored.
+#' @param maxstepno A numeric value containing the maximal number of boosting steps considered during the cross validation (only used if cv=TRUE).
+#' @param nu A numeric value between 0 and 1, the shrinkage parameter for the stagewise regression algorithm. Setting it to values such as nu=0.1 avoids overfitting in early steps.
+#' @param cv A boolean value indicating if cross validation should be performed.
+#' @param multicore A boolean value indication if more than one core should be used for the cross validation (for this the parallel package is needed).
+#' @param RepMean A numeric value indicating the number of modified datasets used the estimate.
+#' @param switch.to A numeric value indicating the number of the first risk up to which the observations can be switched. It sets the value switch.t. If switch.t is specified, switch.to will be ignored.
+#' @param switch.t A numeric value indicating the time point up to which the observations can be switched. If this value is not NULL, switch.to will be ignored.
+#' @param seed.start A numeric value indicating the first seed value. 
+#' @param trace A boolean value indicating if additonal information should be printed out during the process.
+#' @param switches A numeric value indicating the number of switches to be made.
+#' @return An object of type meanPseudoBoost containing the estimates and the performed boosting step number.
+#' @import prodlim
+#' @export 
 meanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,RepMean=50,switch.to=150,switch.t=NULL,seed.start=NULL,trace=TRUE,switches = 1000,...){
   require(prodlim)
   

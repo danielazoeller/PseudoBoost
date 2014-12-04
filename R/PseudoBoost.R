@@ -1,7 +1,7 @@
 #' Perform stagewise pseudo-value regression for the first risk in a competing risk setting
 #' 
 #' Takes in eather the data, xmat, times, stepno ....
-#' @param object A data.frame containing (start and stop time or observation times) AND status or a numeric matrix containing the pseudo-values for the CIF for the risk 1
+#' @param object A data.frame containing observation times AND statuses or a numeric matrix containing the pseudo-values for the CIF for the risk 1
 #' @param xmat A numeric matrix containing the covariate values for all patients.
 #' @param times A numeric vector containing the evaluation times.
 #' @param stepno A numeric value containing the number of boosting steps to be performed. If you use cross validation (cv=TRUE), this parameter will be ignored.
@@ -19,7 +19,7 @@ PseudoBoost <- function(object,...){
 #' Perform stagewise pseudo-value regression for the first risk in a competing risk setting
 #' 
 #' Takes in eather the data, xmat, times, stepno ....
-#' @param data A data.frame containing (start and stop time or observation times) AND status
+#' @param data A data.frame containing observation times AND status
 #' @param xmat A numeric matrix containing the covariate values for all patients.
 #' @param times A numeric vector containing the evaluation times.
 #' @param stepno A numeric value containing the number of boosting steps to be performed. If you use cross validation (cv=TRUE), this parameter will be ignored.
