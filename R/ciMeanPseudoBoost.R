@@ -2,7 +2,7 @@ ciMeanPseudoBoost <- function(object,...){
   UseMethod("ciMeanPseudoBoost",object)
 }
 
-ciMeanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,RepMean=50,part=0.632,switch.to=150,switch.t=NULL,seed.start=NULL,trace=TRUE,RepCi=100,alpha=0.05,cv_est=TRUE,switches=NULL,...){
+ciMeanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,RepMean=50,switch.to=150,switch.t=NULL,seed.start=NULL,switches=NULL,trace=TRUE,part=0.632,RepCi=100,alpha=0.05,cv_est=TRUE,...){
   
   obs.time <- data[[1]]
   status <- data[[2]]

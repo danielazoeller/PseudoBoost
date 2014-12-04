@@ -2,7 +2,7 @@ cbMeanPseudoBoost <- function(object,...){
   UseMethod("cbMeanPseudoBoost",object)
 }
 
-cbMeanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,RepMean=50,part=0.632,switch.to=150,switch.t=NULL,seed.start=NULL,trace=TRUE,RepCb=100,alpha=0.05,cv_est=TRUE,switches=NULL,step.point=0.001,...){
+cbMeanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,RepMean=50,switch.to=150,switch.t=NULL,seed.start=NULL,trace=TRUE,switches=NULL,part=0.632,RepCb=100,alpha=0.05,cv_est=TRUE,step.point=0.001,...){
   
   obs.time <- data[[1]]
   status <- data[[2]]
