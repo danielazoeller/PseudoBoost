@@ -227,7 +227,7 @@ meanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=
   return(res.mean)
 }
 
-#' Plot an object of class meanPseudoBoost. Output as PDF.
+#' Plot an object of class meanPseudoBoost. The estimated effects will be plotted against the evaluation times saved in the object. Output as PDF.
 #' 
 #' @param object An object of class meanPseudoBoost created by meanPseudoBoost().
 #' @param est A numeric vector containing the indices of the estimated to be plotted. est=c(1) will e.g. plot the estimated intercept.
