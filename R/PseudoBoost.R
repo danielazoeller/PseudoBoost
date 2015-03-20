@@ -1,6 +1,10 @@
-#' Perform stagewise pseudo-value regression for the first risk in a competing risk setting
+#' Perform stagewise pseudo-value regression for the interesting risk in a competing risk setting
 #' 
-#' Takes in eather the data, xmat, times, stepno ....
+#' This function performs stagewise pseudo-value regression with the help of boosting for the CIF of the interesting risk.
+#' Calls the functions to perform Boosting for pseudo-values for the CIF of the first risk in a competing risk setting depending on the type of the object.
+#' The object can either be a data frame containing the observation times and statuses or a numeric matrix containing the pseudo-values for the CIF for the interesting risk obtained with the help of the package "prodlim" (jackknife(prodlim(Hist(observation-times-vector,status-vector) ~ 1), times=evaluation-times-vector, cause=interesting-cause-number)).
+#' Thereby the statuses in the data frame should be natrual numbers and coded as follows: (0=Censored, 1=Interesting risk, >1=Other risks). 
+#' Additonally you have to put in the following arguments.
 #' @param object A data.frame containing observation times AND statuses or a numeric matrix containing the pseudo-values for the CIF for the risk 1
 #' @param xmat A numeric matrix containing the covariate values for all patients.
 #' @param times A numeric vector containing the evaluation times.
@@ -17,10 +21,13 @@ PseudoBoost <- function(object,...){
   UseMethod("PseudoBoost",object)
 }
 
-#' Perform stagewise pseudo-value regression for the first risk in a competing risk setting
+#' Perform stagewise pseudo-value regression for the risk 1 in a competing risk setting
 #' 
-#' Takes in eather the data, xmat, times, stepno ....
-#' @param data A data.frame containing observation times AND status
+#' This function performs stagewise pseudo-value regression with the help of boosting for the CIF of the interesting risk.
+#' The data frame must contain the observation times and statuses.
+#' Thereby the statuses in the data frame should be natrual numbers and coded as follows: (0=Censored, 1=Interesting risk, >1=Other risks). 
+#' Additonally you have to put in the following arguments.
+#' @param data A data.frame containing observation times AND status (Coding: 0=Censored, 1=Interesting risk, >1=Other risks)
 #' @param xmat A numeric matrix containing the covariate values for all patients.
 #' @param times A numeric vector containing the evaluation times.
 #' @param stepno A numeric value containing the number of boosting steps to be performed. If you use cross validation (cv=TRUE), this parameter will be ignored.
@@ -51,7 +58,10 @@ PseudoBoost.data.frame <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0
 
 #' Perform stagewise pseudo-value regression for the first risk in a competing risk setting
 #' 
-#' Takes in eather the data, xmat, times, stepno ....
+#' This function performs stagewise pseudo-value regression with the help of boosting for the CIF of the interesting risk.
+#' The ymat a numeric matrix containing the pseudo-values for the CIF for the interesting risk obtained with the help of the package "prodlim" (jackknife(prodlim(Hist(observation-times-vector,status-vector) ~ 1), times=evaluation-times-vector, cause=interesting-risk-number)).
+#' Thereby the statuses in the data frame should be natrual numbers and coded as follows: (0=Censored, 1=Interesting risk, >1=Other risks). 
+#' Additonally you have to put in the following arguments.
 #' @param ymat A numeric matrix containing the pseudo-values for the CIF for the risk 1
 #' @param xmat A numeric matrix containing the covariate values for all patients.
 #' @param times A numeric vector containing the evaluation times.
