@@ -202,6 +202,7 @@ cbMeanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
   #Idee: Verringere alpha_punktweise solange, bis 1/B * Summe(1[ein Schätzer außerhalb der punktweisen Intervalle]) etwa alpha_simultan
 }
 
+
 cbMeanPseudoBoost.simulation <- function(n,times, stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,RepMean=50,switch.to=150,seed.start=NULL,trace=TRUE,RepCb=100,alpha=0.05,cv_est=TRUE,switches=NULL,step.point=0.001,...){
   
   if(RepMean==0){
@@ -345,7 +346,8 @@ cbMeanPseudoBoost.simulation <- function(n,times, stepno=100,maxstepno=100,nu=0.
   res.mean.ci[[xindex+1]] <- stepno
   res.mean.ci[[xindex+2]] <- alpha.point
   res.mean.ci[[xindex+3]] <- alpha.res
-  names(res.mean.ci) <- c(names(res.zwischen),"alpha.point","alpha.res")
+  res.mean.ci[[xindex+4]] <- times
+  names(res.mean.ci) <- c(names(res.zwischen),"alpha.point","alpha.res","evaluation.times")
   
   
   class(res.mean.ci) <- "cbMeanPseudoBoost"
@@ -354,7 +356,16 @@ cbMeanPseudoBoost.simulation <- function(n,times, stepno=100,maxstepno=100,nu=0.
   #Idee: Verringere alpha_punktweise solange, bis 1/B * Summe(1[ein Schätzer außerhalb der punktweisen Intervalle]) etwa alpha_simultan
 }
 
-plot.cbMeanPseudoBoost <- function(object,eval.times,est, ci,alpha=0.05,trans=TRUE,name="results.pdf"){
+#' Plot confidence bands and estimates.
+#' 
+#' @param object Object of type cbMeanPseudoBoost
+#' @param est A numeric vector indicating the index of the estimates to be plotted.
+#' @param ci A numeric vector indicating the index of the estimates to be plotted with confidence bands.
+#' @param trans A boolean vector indicating if the results should be transformed (trans=TRUE => Plot exponential of the estimates).
+#' @param name A string value indicating the name of the resulting PDF. E.g. name="results.pdf"
+#' @return A PDF document with the name "name".
+#' @export 
+plot.cbMeanPseudoBoost <- function(object,est, ci,alpha=0.05,trans=TRUE,name="results.pdf"){
   pdf(name)
   if (length(est) != 0) {
     if(trans==TRUE){plot(0,type="n",xlab="time",ylab="coefficient",xlim=c(0,1.3*max(eval.times)),ylim=c(0,2))}
