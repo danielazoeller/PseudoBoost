@@ -150,14 +150,24 @@ ciMeanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
   }
   
   res.mean.ci[[xindex+1]] <- stepno
+  res.mean.ci[[xindex+2]] <- times
   
-  names(res.mean.ci) <- names(res.mean)
+  names(res.mean.ci) <- c(names(res.mean),"evaluation.times")
   
   class(res.mean.ci) <- "ciMeanPseudoBoost"
   return(res.mean.ci)
 }
 
-plot.ciMeanPseudoBoost <- function(object,eval.times,est, ci,alpha=0.05,trans=TRUE,name="results.pdf"){
+#' Plot confidence intervals and estimates.
+#' 
+#' @param object Object of type ciMeanPseudoBoost
+#' @param est A numeric vector indicating the index of the estimates to be plotted.
+#' @param ci A numeric vector indicating the index of the estimates to be plotted with confidence bands.
+#' @param trans A boolean vector indicating if the results should be transformed (trans=TRUE => Plot exponential of the estimates).
+#' @param name A string value indicating the name of the resulting PDF. E.g. name="results.pdf"
+#' @return A PDF document with the name "name".
+#' @export 
+plot.ciMeanPseudoBoost <- function(object,est, ci,alpha=0.05,trans=TRUE,name="results.pdf"){
   pdf(name)
   if (length(est) != 0) {
     if(trans==TRUE){plot(0,type="n",xlab="time",ylab="coefficient",xlim=c(0,1.3*max(eval.times)),ylim=c(0,2))}
