@@ -152,7 +152,7 @@ ciMeanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
   res.mean.ci[[xindex+1]] <- stepno
   res.mean.ci[[xindex+2]] <- times
   
-  names(res.mean.ci) <- c(names(res.mean),"evaluation.times")
+  names(res.mean.ci) <- c(names(res.mean)[1:xindex],"stepno","evaluation.times")
   
   class(res.mean.ci) <- "ciMeanPseudoBoost"
   return(res.mean.ci)
