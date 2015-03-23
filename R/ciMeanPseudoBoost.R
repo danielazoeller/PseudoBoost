@@ -169,6 +169,7 @@ ciMeanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
 #' @export 
 plot.ciMeanPseudoBoost <- function(object,est, ci,alpha=0.05,trans=TRUE,name="results.pdf"){
   pdf(name)
+  eval.times <- object$evaluation.times
   if (length(est) != 0) {
     if(trans==TRUE){plot(0,type="n",xlab="time",ylab="coefficient",xlim=c(0,1.3*max(eval.times)),ylim=c(0,2))}
     else{plot(0,type="n",xlab="time",ylab="coefficient",xlim=c(0,1.3*max(eval.times)),ylim=c(-2,2))}
