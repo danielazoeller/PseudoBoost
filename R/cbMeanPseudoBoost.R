@@ -193,7 +193,8 @@ cbMeanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
   res.mean.ci[[xindex+1]] <- stepno
   res.mean.ci[[xindex+2]] <- alpha.point
   res.mean.ci[[xindex+3]] <- alpha.res
-  names(res.mean.ci) <- c(names(res.mean),"alpha.point","alpha.res")
+  res.mean.ci[[xindex+4]] <- times
+  names(res.mean.ci) <- c(names(res.mean),"stepno","alpha.point","alpha.res","evaluation.times")
   
   
   class(res.mean.ci) <- "cbMeanPseudoBoost"
