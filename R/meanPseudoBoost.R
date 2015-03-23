@@ -232,7 +232,7 @@ meanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=
 #' @param object An object of class meanPseudoBoost created by meanPseudoBoost().
 #' @param est A numeric vector containing the indices of the estimated to be plotted. est=c(1) will e.g. plot the estimated intercept.
 #' @param comb A boolean vector indicating if the results should be combined in one plot (comb=TRUE) or if each estimate should be plotted seperately (comb=FALSE).
-#' @param trans A boolean vecotr indicating if the results should be transformed (trans=TRUE => Plot exponential of the estimates).
+#' @param trans A boolean vector indicating if the results should be transformed (trans=TRUE => Plot exponential of the estimates).
 #' @param name A string value indicating the name of the resulting PDF. E.g. name="results.pdf"
 #' @return A PDF document with the name "name".
 #' @export 
