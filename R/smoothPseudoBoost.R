@@ -11,7 +11,6 @@
 #' @param multicore A boolean value indication if more than one core should be used for the cross validation (for this the parallel package is needed).
 #' @param RepSmooth A numeric value indicating the number of modified datasets used the estimate.
 #' @param smooth_para A numeric value used for smoothing with the beta-distribution (Variance of beta-distribution).
-#' @param true_obs A boolean value indicating if the true observed times should be included additionally to the RepSmooth-datasets.
 #' @param seed.start A numeric value indicating the first seed value. 
 #' @param trace A boolean value indicating if additonal information should be printed out during the process.
 #' @return An object of type meanPseudoBoost containing the estimates, the performed boosting step number and the evaluation times.
@@ -35,14 +34,13 @@ smoothPseudoBoost <- function(object,...){
 #' @param multicore A boolean value indication if more than one core should be used for the cross validation (for this the parallel package is needed).
 #' @param RepSmooth A numeric value indicating the number of modified datasets used the estimate.
 #' @param smooth_para A numeric value used for smoothing with the beta-distribution (Variance of beta-distribution).
-#' @param true_obs A boolean value indicating if the true observed times should be included additionally to the RepSmooth-datasets.
 #' @param seed.start A numeric value indicating the first seed value. 
 #' @param trace A boolean value indicating if additonal information should be printed out during the process.
 #' @return An object of type meanPseudoBoost containing the estimates, the performed boosting step number and the evaluation times.
 #' @import prodlim
 #' @import etm
 #' @export 
-smoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,RepSmooth=20,smooth_para = 2,true_obs = FALSE,seed.start=NULL,trace=TRUE,...){
+smoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,RepSmooth=20,smooth_para = 2,seed.start=NULL,trace=TRUE,...){
   require(prodlim)
   set.seed(seed.start)
   
@@ -83,46 +81,72 @@ smoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
     CIF <- trprob(etmCIF_kurz(data.frame(entry=rep(0,n),exit=obs.time,status=status),n)[[1]], "0 1", obs.time)
     CIF_sort <- data.frame(time = sort(obs.time), CIF=CIF[order(obs.time)])
     
-    mini <- min(CIF[cause_1])/((1+min(CIF[cause_1]))^2)
+    #on [0,1]:
+    #mini <- min(CIF[cause_1])/((1+min(CIF[cause_1]))^2)
+    #on [0,max(CIF[cause_1])]
+    mini <- (min(CIF[cause_1])/max(CIF[cause_1]))/((1+(min(CIF[cause_1])/max(CIF[cause_1])))^2)
     if(mini<smooth_para){
       smooth_para <- mini-(mini/100)
       cat("ERROR: Variance of beta-distribution (smooth_para) must be smaller than ",mini,". Value has been set to be a little bit smaller than this value.")
     }
-    
+    #auf[0,max(CIF[cause_1])]:
+    smooth_scale <- smooth_para/((max(CIF[cause_1]))^2)
+  
     for(i in cause_1){
-      cif_delta_i <- (1-CIF[i])/CIF[i]
+      #beta distribution on [0,1]
+#       cif_delta_i <- (1-CIF[i])/CIF[i]
+#       
+#       a <- cif_delta_i - (((1+cif_delta_i)^2)*smooth_para)
+#       b <- (smooth_para) * ((1+cif_delta_i)^3)
+#       p <- a/b
+#       
+#       q=cif_delta_i * p
+#             
+#       value[i,] <- rbeta(20,p,q)
       
-      a <- cif_delta_i - (((1+cif_delta_i)^2)*smooth_para)
-      b <- (smooth_para) * ((1+cif_delta_i)^3)
+      #beta distribution on [0,max(CIF[cause_1])]
+      cif_i <- CIF[i]/max(CIF[cause_1])
+      cif_delta_i <- (1-cif_i)/cif_i
+      
+      a <- (cif_delta_i/max(CIF[cause_1]) - (((1+(cif_delta_i/max(CIF[cause_1]))^2)*smooth_scale)
+      b <- (smooth_scale) * ((1+cif_delta_i)^3)
       p <- a/b
       
       q=cif_delta_i * p
-            
-      value[i,] <- rbeta(20,p,q)
+      
+      value[i,] <- max(CIF[cause_1]) * rbeta(20,p,q)
       #mehrere Varianten zur Bestimmung der Zeit mit dieser CIF: 
       #1. Bereich mit letzte CIF<berechnete oder erste CIF>=berechnete
       #2. Start oder Stop-Zeit dieses Bereichs
       #3. Intrapoliert zwischen Sprungzeiten
       for(j in 1:RepSmooth){#Variante 3
-        index <- which(CIF_sort[,2]==value[i,j])
-        if(length(index)==0 && any(CIF_sort$CIF>value[i,j])){
+        if(any(CIF_sort$CIF>value[i,j]) && any(CIF_sort$CIF<value[i,j])){
           arg <- min(which(CIF_sort$CIF>value[i,j]))
           time_smooth[i,j] <- (CIF_sort$time[arg-1]*((CIF_sort$CIF[arg]-value[i,j])/(CIF_sort$CIF[arg]-CIF_sort$CIF[arg-1]))) + (CIF_sort$time[arg]*((value[i,j]-CIF_sort$CIF[arg-1])/(CIF_sort$CIF[arg]-CIF_sort$CIF[arg-1])))
-        } else if (any(CIF_sort$CIF>value[i,j])){
-          time_smooth[i,j] <- runif(1,min=CIF_sort$time[index[1]],max=CIF_sort$time[index[length(index)]])
-        } else {
+        } else if(any(CIF_sort$CIF>value[i,j]){
+          time_smooth[i,j] <- min(CIF_sort$time)
+        }else{
           time_smooth[i,j] <- max(CIF_sort$time)
         }
         
       }
+      
+      #Versuch 1
+#       for(j in 1:RepSmooth){#Variante 3
+#         index <- which(CIF_sort[,2]==value[i,j])
+#         if(length(index)==0 && any(CIF_sort$CIF>value[i,j]) && any(CIF_sort$CIF<value[i,j])){
+#           arg <- min(which(CIF_sort$CIF>value[i,j]))
+#           time_smooth[i,j] <- (CIF_sort$time[arg-1]*((CIF_sort$CIF[arg]-value[i,j])/(CIF_sort$CIF[arg]-CIF_sort$CIF[arg-1]))) + (CIF_sort$time[arg]*((value[i,j]-CIF_sort$CIF[arg-1])/(CIF_sort$CIF[arg]-CIF_sort$CIF[arg-1])))
+#         } else if (any(CIF_sort$CIF>value[i,j]) && any(CIF_sort$CIF<value[i,j])){
+#           arg <- min(which(CIF_sort$CIF>value[i,j]))
+#           time_smooth[i,j] <- (CIF_sort$time[arg-1]*((CIF_sort$CIF[arg]-value[i,j])/(CIF_sort$CIF[arg]-CIF_sort$CIF[arg-2])))
+#         } else {
+#           time_smooth[i,j] <- max(CIF_sort$time)
+#         }
+#         
+#       }
     }
-  if(true_obs){
-    time_smooth <- cbind(obs.time,time_smooth)
-    if(trace){
-      cat("The true observations times will be inluded addiotonally in the estimate.")
-    }
-    RepSmooth <- RepSmooth+1
-  }
+  
   if(RepSmooth>0){
     for (i in 1:RepSmooth) {
       set.seed(seed.start+i*100)
