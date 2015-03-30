@@ -82,16 +82,19 @@ smoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
     CIF_sort <- data.frame(time = sort(obs.time), CIF=CIF[order(obs.time)])
     
     #on [0,1]:
-    #mini <- min(CIF[cause_1])/((1+min(CIF[cause_1]))^2)
+    #cif_delta_min <- (1-(min(CIF[cause_1])))/(min(CIF[cause_1]))
+    #mini <- cif_delta_min/((1+cif_delta_min)^2)
     #on [0,max(CIF[cause_1])]
-    mini <- (min(CIF[cause_1])/max(CIF[cause_1]))/((1+(min(CIF[cause_1])/max(CIF[cause_1])))^2)
-    if(mini<smooth_para){
-      smooth_para <- mini-(mini/100)
-      cat("ERROR: Variance of beta-distribution (smooth_para) must be smaller than ",mini,". Value has been set to be a little bit smaller than this value.")
-    }
+    cif_delta_min <- (1-(min(CIF[cause_1])/max(CIF[cause_1])))/(min(CIF[cause_1])/max(CIF[cause_1]))
+    mini <- cif_delta_min/((1+cif_delta_min)^2)
+    
     #auf[0,max(CIF[cause_1])]:
     smooth_scale <- smooth_para/((max(CIF[cause_1]))^2)
-  
+    if(mini<smooth_scale){
+      smooth_scale <- mini-(mini/100)
+      smooth_para_new <- smooth_scale*((max(CIF[cause_1]))^2)
+      cat("ERROR: Variance of beta-distribution (smooth_para) must be smaller. Value has been set to be a little bit smaller: ",smooth_para_new)
+    }
     for(i in cause_1){
       #beta distribution on [0,1]
 #       cif_delta_i <- (1-CIF[i])/CIF[i]
@@ -123,9 +126,9 @@ smoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
         if(any(CIF_sort$CIF>value[i,j]) && any(CIF_sort$CIF<value[i,j])){
           arg <- min(which(CIF_sort$CIF>value[i,j]))
           time_smooth[i,j] <- (CIF_sort$time[arg-1]*((CIF_sort$CIF[arg]-value[i,j])/(CIF_sort$CIF[arg]-CIF_sort$CIF[arg-1]))) + (CIF_sort$time[arg]*((value[i,j]-CIF_sort$CIF[arg-1])/(CIF_sort$CIF[arg]-CIF_sort$CIF[arg-1])))
-        } else if(any(CIF_sort$CIF>value[i,j]){
+        } else if (any(CIF_sort$CIF>value[i,j])){
           time_smooth[i,j] <- min(CIF_sort$time)
-        }else{
+        } else {
           time_smooth[i,j] <- max(CIF_sort$time)
         }
         
