@@ -84,15 +84,16 @@ smoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
     #on [0,1]:
     #cif_delta_min <- (1-(min(CIF[cause_1])))/(min(CIF[cause_1]))
     #mini <- cif_delta_min/((1+cif_delta_min)^2)
-    #on [0,max(CIF[cause_1])]
-    cif_delta_min <- (1-(min(CIF[cause_1])/max(CIF[cause_1])))/(min(CIF[cause_1])/max(CIF[cause_1]))
+    #on [0,cif_max]
+    cif_max <- min(c(1,max(CIF[cause_1]+0.01)))
+    cif_delta_min <- (1-(min(CIF[cause_1])/cif_max))/(min(CIF[cause_1])/cif_max)
     mini <- cif_delta_min/((1+cif_delta_min)^2)
     
-    #auf[0,max(CIF[cause_1])]:
-    smooth_scale <- smooth_para/((max(CIF[cause_1]))^2)
+    #auf[0,cif_max]:
+    smooth_scale <- smooth_para/((cif_max)^2)
     if(mini<smooth_scale){
       smooth_scale <- mini-(mini/100)
-      smooth_para_new <- smooth_scale*((max(CIF[cause_1]))^2)
+      smooth_para_new <- smooth_scale*((cif_max)^2)
       cat("ERROR: Variance of beta-distribution (smooth_para) must be smaller. Value has been set to be a little bit smaller: ",smooth_para_new)
     }
     for(i in cause_1){
@@ -107,8 +108,8 @@ smoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
 #             
 #       value[i,] <- rbeta(20,p,q)
       
-      #beta distribution on [0,max(CIF[cause_1])]
-      cif_i <- CIF[i]/max(CIF[cause_1])
+      #beta distribution on [0,cif_max]
+      cif_i <- CIF[i]/cif_max
       cif_delta_i <- ((1-cif_i)/cif_i)
       
       a <- cif_delta_i - (((1+cif_delta_i)^2)*smooth_scale)
@@ -117,7 +118,7 @@ smoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
       
       q=cif_delta_i * p
       
-      value[i,] <- max(CIF[cause_1]) * rbeta(20,p,q)
+      value[i,] <- cif_max * rbeta(20,p,q)
       #mehrere Varianten zur Bestimmung der Zeit mit dieser CIF: 
       #1. Bereich mit letzte CIF<berechnete oder erste CIF>=berechnete
       #2. Start oder Stop-Zeit dieses Bereichs
