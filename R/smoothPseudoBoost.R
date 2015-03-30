@@ -106,9 +106,9 @@ smoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
       
       #beta distribution on [0,max(CIF[cause_1])]
       cif_i <- CIF[i]/max(CIF[cause_1])
-      cif_delta_i <- (1-cif_i)/cif_i
+      cif_delta_i <- ((1-cif_i)/cif_i)
       
-      a <- (cif_delta_i/max(CIF[cause_1]) - (((1+(cif_delta_i/max(CIF[cause_1]))^2)*smooth_scale)
+      a <- cif_delta_i - (((1+cif_delta_i)^2)*smooth_scale)
       b <- (smooth_scale) * ((1+cif_delta_i)^3)
       p <- a/b
       
