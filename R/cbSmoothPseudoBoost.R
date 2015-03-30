@@ -13,8 +13,6 @@
 #' @param smooth_para A numeric value used for smoothing with the beta-distribution (Variance of beta-distribution).
 #' @param seed.start A numeric value indicating the first seed value. 
 #' @param trace A boolean value indicating if additonal information should be printed out during the process.
-#' @param switches A numeric value indicating the number of switches to be made.
-#' @param trace A boolean value indicating if additonal information should be printed to the console (=TRUE)
 #' @param part A numeric value between 0 and 1 indicating the fraction which should be used in the resampling approach (=0.632=
 #' @param RepCb A numeric value indicating the number of Resampling data sets (=100)
 #' @param alpha A numeric value between 0 and 1 indicating the type 1 error (=0.05)
@@ -41,15 +39,13 @@ cbSmoothPseudoBoost <- function(object,...){
 #' @param smooth_para A numeric value used for smoothing with the beta-distribution (Variance of beta-distribution).
 #' @param seed.start A numeric value indicating the first seed value. 
 #' @param trace A boolean value indicating if additonal information should be printed out during the process.
-#' @param switches A numeric value indicating the number of switches to be made.
-#' @param trace A boolean value indicating if additonal information should be printed to the console (=TRUE)
 #' @param part A numeric value between 0 and 1 indicating the fraction which should be used in the resampling approach (=0.632=
 #' @param RepCb A numeric value indicating the number of Resampling data sets (=100)
 #' @param alpha A numeric value between 0 and 1 indicating the type 1 error (=0.05)
 #' @param cv_est A boolean value indicating if cross validation should be performed for the estimates seperately (=TRUE)
 #' @return An object of type cbSmoothPseudoBoost containing the estimates and the performed boosting step number.
 #' @export 
-cbSmoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,RepSmooth=50,switch.to=150,switch.t=NULL,seed.start=NULL,trace=TRUE,switches=NULL,part=0.632,RepCb=100,alpha=0.05,cv_est=TRUE,step.point=0.001,...){
+cbSmoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,RepSmooth=50,smooth_para=0.02,seed.start=NULL,trace=TRUE,part=0.632,RepCb=100,alpha=0.05,cv_est=TRUE,step.point=0.001,...){
   
   obs.time <- data[[1]]
   status <- data[[2]]
@@ -201,7 +197,6 @@ cbSmoothPseudoBoost.simulation <- function(n,times, stepno=100,maxstepno=100,nu=
   
   
   
-  #res.mean <- meanPseudoBoost(data,xmat=xmat,times=times,stepno=stepno,maxstepno=maxstepno,nu=nu,cv=cv_est,multicore=multicore,RepSmooth=RepSmooth,switch.to=switch.to,seed.start=seed.start,trace=FALSE,switches=switches)
   
   res.mean.ci <- list()
   
