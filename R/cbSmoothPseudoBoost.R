@@ -1,6 +1,6 @@
 #' Perform smoothed stagewise pseudo-value regression for the first risk in a competing risk setting and calculate confidence bands based on pointwise confidence intervals.
 #' 
-#' Creates RepSmooth modified datasets with the help of randomly changed CIF-values and corresponding observation times. For these dataset the function PseudoBoost will be called seperately and the mean value is taken for each effect estimate at each considered time point.#' @param data A data.frame containing observation times AND statuses
+#' Creates RepSmooth modified datasets with the help of randomly changed CIF-values and corresponding observation times. For these dataset the function PseudoBoost will be called seperately and the mean value is taken for each effect estimate at each considered time point.
 #' @param data A data.frame containing observation times AND statuses
 #' @param xmat A numeric matrix containing the covariate values for all patients.
 #' @param times A numeric vector containing the evaluation times.
@@ -9,7 +9,7 @@
 #' @param nu A numeric value between 0 and 1, the shrinkage parameter for the stagewise regression algorithm. Setting it to values such as nu=0.1 avoids overfitting in early steps.
 #' @param cv A boolean value indicating if cross validation should be performed.
 #' @param multicore A boolean value indication if more than one core should be used for the cross validation (for this the parallel package is needed).
-#' @param Repsmooth A numeric value indicating the number of modified datasets used the estimate.
+#' @param RepSmooth A numeric value indicating the number of modified datasets used the estimate.
 #' @param smooth_para A numeric value used for smoothing with the beta-distribution (Variance of beta-distribution).
 #' @param seed.start A numeric value indicating the first seed value. 
 #' @param trace A boolean value indicating if additonal information should be printed out during the process.
@@ -17,6 +17,7 @@
 #' @param RepCb A numeric value indicating the number of Resampling data sets (=100)
 #' @param alpha A numeric value between 0 and 1 indicating the type 1 error (=0.05)
 #' @param cv_est A boolean value indicating if cross validation should be performed for the estimates seperately (=TRUE)
+#' @param step.point A numeric value indicating the stepwise increase of the local significance level.
 #' @return An object of type cbSmoothPseudoBoost containing the estimates and the performed boosting step number.
 #' @export 
 
@@ -26,7 +27,7 @@ cbSmoothPseudoBoost <- function(object,...){
 
 #' Perform smoothed stagewise pseudo-value regression for the first risk in a competing risk setting and calculate confidence bands based on pointwise confidence intervals.
 #' 
-#' Creates RepSmooth modified datasets with the help of randomly changed CIF-values and corresponding observation times. For these dataset the function PseudoBoost will be called seperately and the mean value is taken for each effect estimate at each considered time point.#' @param data A data.frame containing observation times AND statuses
+#' Creates RepSmooth modified datasets with the help of randomly changed CIF-values and corresponding observation times. For these dataset the function PseudoBoost will be called seperately and the mean value is taken for each effect estimate at each considered time point.
 #' @param data A data.frame containing observation times AND statuses
 #' @param xmat A numeric matrix containing the covariate values for all patients.
 #' @param times A numeric vector containing the evaluation times.
@@ -35,7 +36,7 @@ cbSmoothPseudoBoost <- function(object,...){
 #' @param nu A numeric value between 0 and 1, the shrinkage parameter for the stagewise regression algorithm. Setting it to values such as nu=0.1 avoids overfitting in early steps.
 #' @param cv A boolean value indicating if cross validation should be performed.
 #' @param multicore A boolean value indication if more than one core should be used for the cross validation (for this the parallel package is needed).
-#' @param Repsmooth A numeric value indicating the number of modified datasets used the estimate.
+#' @param RepSmooth A numeric value indicating the number of modified datasets used the estimate.
 #' @param smooth_para A numeric value used for smoothing with the beta-distribution (Variance of beta-distribution).
 #' @param seed.start A numeric value indicating the first seed value. 
 #' @param trace A boolean value indicating if additonal information should be printed out during the process.
@@ -43,6 +44,7 @@ cbSmoothPseudoBoost <- function(object,...){
 #' @param RepCb A numeric value indicating the number of Resampling data sets (=100)
 #' @param alpha A numeric value between 0 and 1 indicating the type 1 error (=0.05)
 #' @param cv_est A boolean value indicating if cross validation should be performed for the estimates seperately (=TRUE)
+#' @param step.point A numeric value indicating the stepwise increase of the local significance level.
 #' @return An object of type cbSmoothPseudoBoost containing the estimates and the performed boosting step number.
 #' @export 
 cbSmoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,RepSmooth=50,smooth_para=0.02,seed.start=NULL,trace=TRUE,part=0.632,RepCb=100,alpha=0.05,cv_est=TRUE,step.point=0.001,...){
@@ -50,9 +52,6 @@ cbSmoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100
   obs.time <- data[[1]]
   status <- data[[2]]
   
-  if(RepSmooth==0){
-    RepSmooth <- 1
-  }
   
   
   if(is.null(seed.start)){
@@ -60,11 +59,15 @@ cbSmoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100
   }
   
   if(length(stepno) != RepSmooth){
-    stepno=rep(stepno[1],RepSmooth)
+    if(RepSmooth>0){
+      stepno=rep(stepno[1],RepSmooth)
+    } else{
+      stepno=stepno[1]
+    }
   }
 
   
-  res.mean <- smoothPseudoBoost(data,xmat=xmat,times=times,stepno=stepno,maxstepno=maxstepno,nu=nu,cv=cv_est,multicore=multicore,RepSmooth=RepSmooth,smooth_para=smooth_para,seed.start=seed.start,trace=FALSE)
+  res.mean <- smoothPseudoBoost(data,xmat=xmat,times=times,stepno=stepno,maxstepno=maxstepno,nu=nu,cv=cv,multicore=multicore,RepSmooth=RepSmooth,smooth_para=smooth_para,seed.start=seed.start,trace=FALSE)
   
   res.mean.ci <- list()
   n <- nrow(xmat)
@@ -101,6 +104,7 @@ cbSmoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100
   
   if (!cv){
     stepno <- res.mean$stepno
+    print(stepno)
   }
   
   for(j in 1:RepCb){
@@ -117,7 +121,7 @@ cbSmoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100
     
     
     
-    zwischen <- smoothPseudoBoost(as.data.frame(cbind(obs.timesub,statussub)),xmat=xmatsub,times=times,stepno=stepno,maxstepno=maxstepno,nu=nu,cv=cv,multicore=multicore,RepSmooth=RepSmooth,smooth_para = smooth_para, seed.start=seed.start.Mean,trace=FALSE)
+    zwischen <- smoothPseudoBoost(as.data.frame(cbind(obs.timesub,statussub)),xmat=xmatsub,times=times,stepno=stepno,maxstepno=maxstepno,nu=nu,cv=cv_est,multicore=multicore,RepSmooth=RepSmooth,smooth_para = smooth_para, seed.start=seed.start.Mean,trace=FALSE)
     
     
     if(j == 1){

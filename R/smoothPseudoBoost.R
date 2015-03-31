@@ -49,7 +49,11 @@ smoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
     
     
   if(length(stepno) != RepSmooth){
-    stepno=rep(stepno[1],RepSmooth)
+    if(RepSmooth>0){
+      stepno=rep(stepno[1],RepSmooth)
+    } else{
+      stepno=stepno[1]
+    }
   }
   
   
@@ -60,6 +64,7 @@ smoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
   
   ymatsub.list = vector("list",n)
   
+  if(RepSmooth>0){
     etmCIF_kurz <- function(data,n_data){
       require(etm)
       states <- data$status
@@ -128,9 +133,9 @@ smoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
           arg <- min(which(CIF_sort$CIF>value[i,j]))
           time_smooth[i,j] <- (CIF_sort$time[arg-1]*((CIF_sort$CIF[arg]-value[i,j])/(CIF_sort$CIF[arg]-CIF_sort$CIF[arg-1]))) + (CIF_sort$time[arg]*((value[i,j]-CIF_sort$CIF[arg-1])/(CIF_sort$CIF[arg]-CIF_sort$CIF[arg-1])))
         } else if (any(CIF_sort$CIF>value[i,j])){
-          time_smooth[i,j] <- min(CIF_sort$time)
+          time_smooth[i,j] <- min(CIF_sort$time[cause_1])
         } else {
-          time_smooth[i,j] <- max(CIF_sort$time)
+          time_smooth[i,j] <- max(CIF_sort$time[cause_1])
         }
         
       }
@@ -151,7 +156,7 @@ smoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
 #       }
     }
   
-  if(RepSmooth>0){
+  
     for (i in 1:RepSmooth) {
       set.seed(seed.start+i*100)
       cat("Replication:",i,"\n")
