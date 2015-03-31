@@ -102,7 +102,7 @@ cbSmoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100
     return(ci)
   }
   
-  if (!cv){
+  if (!cv_est){
     stepno <- res.mean$stepno
     print(stepno)
   }
@@ -118,7 +118,6 @@ cbSmoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100
     
     obs.timesub <- obs.time[choice]
     statussub <- status[choice]
-    
     
     
     zwischen <- smoothPseudoBoost(as.data.frame(cbind(obs.timesub,statussub)),xmat=xmatsub,times=times,stepno=stepno,maxstepno=maxstepno,nu=nu,cv=cv_est,multicore=multicore,RepSmooth=RepSmooth,smooth_para = smooth_para, seed.start=seed.start.Mean,trace=FALSE)
