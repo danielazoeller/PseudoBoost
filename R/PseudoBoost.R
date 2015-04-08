@@ -223,6 +223,15 @@ PseudoBoost.default <- function(ymat,xmat,stepno=10,nu=0.1,trace=FALSE) {
   return(res)
 }
 
+#' Calculates predicted linear predictor or response (CIF) based on PseudoBoost-Object
+#' 
+#' @param object A PseudoBoost-object
+#' @param newdata A n.new * p matrix with new covariate values.
+#' @param subset An optional vecotr specifying a subset of observations to be used for evaluation
+#' @param at.step A scalar of boosting step at which prediction is wanted.
+#' @param times A vector with T time points where prediction is wanted.
+#' @param type Type of prediction to be returned: "lp" gives the linear predictor, "response" the resulting CIF.
+#' @export 
 predict.PseudoBoost <- function(object,newdata,subset=NULL,at.step=NULL,times=NULL,type = c("lp","response")) {
   type <- match.arg(type)
   
@@ -272,6 +281,17 @@ predict.PseudoBoost <- function(object,newdata,subset=NULL,at.step=NULL,times=NU
   linear.predictor
 }
 
+#' Determines the optimal number of boosting steps by a K-fold cross-validation.
+#' 
+#' @param ymat Matrix of Pseudo Values
+#' @param xmat n* p matrix of covariates
+#' @param subset A vector specifying a subset of observations to be used in the fitting process.
+#' @param maxstepno Maximum number of boosting steps to evaluate, i.e., the returned "optimal" number of boosting steps will be in the range [0,maxstepno]
+#' @param K Number of folds to be used for cross-validation. If K is larger or equal to the number of non-zero elements in status, leave-one-out-cross-validation is performed.
+#' @param multicore Indicates whether computations in the cross-validation folds should be performed in parallel, using package parallel.
+#' @param folds If not NULL, this has to be a list of length K, each element being a vector of indices of fold elements. Useful for employing the same folds for repeated runs.
+#' @param trace Logical vlue indicating whether progress in estimation should be indicated by printing the number of the cross-validation fold and the index of the covariate updated.
+#' @export 
 cv.PseudoBoost <- function (ymat,xmat,subset=1:nrow(ymat),maxstepno=100,K = 10,multicore=FALSE,folds=NULL,trace=FALSE,...) {
   if (!is.null(folds) && length(folds) != K) stop("'folds' has to be of length 'K'")
   
@@ -316,7 +336,15 @@ cv.PseudoBoost <- function (ymat,xmat,subset=1:nrow(ymat),maxstepno=100,K = 10,m
   list(mean.ipec=mean.criterion,optimal.step = which.min(mean.criterion)-1,folds=folds)
 }
 
-predictProb.PseudoBoost <- function (object,response,x,subset=NULL,at.step=NULL,times=NULL) {
+#' Calculates predicted response (CIF) based on PseudoBoost-Object
+#' 
+#' @param object A PseudoBoost-object
+#' @param newdata A n.new * p matrix with new covariate values.
+#' @param subset An optional vecotr specifying a subset of observations to be used for evaluation
+#' @param at.step A scalar of boosting step at which prediction is wanted.
+#' @param times A vector with T time points where prediction is wanted.
+#' @export 
+predictProb.PseudoBoost <- function (object,newdata,subset=NULL,at.step=NULL,times=NULL) {
   
   if (is.null(at.step)) {
     at.step <- object$stepno
@@ -325,10 +353,10 @@ predictProb.PseudoBoost <- function (object,response,x,subset=NULL,at.step=NULL,
   if (!is.null(times) && is.null(object$times)) stop("'times' missing, and no default available")
   
   if (is.null(subset)) {
-    subset.index <- 1:nrow(x)
+    subset.index <- 1:nrow(newdata)
   } else {
-    subset.index <- (1:nrow(x))[subset]
+    subset.index <- (1:nrow(newdata))[subset]
   }
   
-  predict(object,newdata=x,at.step=at.step,type="response")
+  predict(object,newdata=newdata,at.step=at.step,type="response")
 }
