@@ -2,7 +2,7 @@
 % Please edit documentation in R/PseudoBoost.R
 \name{PseudoBoost}
 \alias{PseudoBoost}
-\title{Perform stagewise pseudo-value regression for the first risk in a competing risk setting}
+\title{Perform stagewise pseudo-value regression for the interesting risk in a competing risk setting}
 \usage{
 PseudoBoost(object, ...)
 }
@@ -28,15 +28,9 @@ An object of type PseudoBoost containing the estimates and the performed boostin
 }
 \description{
 This function performs stagewise pseudo-value regression with the help of boosting for the CIF of the interesting risk.
-}
-\details{
 Calls the functions to perform Boosting for pseudo-values for the CIF of the first risk in a competing risk setting depending on the type of the object.
 The object can either be a data frame containing the observation times and statuses or a numeric matrix containing the pseudo-values for the CIF for the interesting risk obtained with the help of the package "prodlim" (jackknife(prodlim(Hist(observation-times-vector,status-vector) ~ 1), times=evaluation-times-vector, cause=interesting-cause-number)).
-Thereby the statuses in the data frame should be numerical and coded as follows:
-0=Censored
-1=Interesting risk
->1=Other risks
-
-Additonally you have to input the following arguments.
+Thereby the statuses in the data frame should be natrual numbers and coded as follows: (0=Censored, 1=Interesting risk, >1=Other risks).
+Additonally you have to put in the following arguments.
 }
 

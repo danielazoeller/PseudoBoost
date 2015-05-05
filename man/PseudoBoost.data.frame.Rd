@@ -2,13 +2,13 @@
 % Please edit documentation in R/PseudoBoost.R
 \name{PseudoBoost.data.frame}
 \alias{PseudoBoost.data.frame}
-\title{Perform stagewise pseudo-value regression for the first risk in a competing risk setting}
+\title{Perform stagewise pseudo-value regression for the risk 1 in a competing risk setting}
 \usage{
 \method{PseudoBoost}{data.frame}(data, xmat, times, stepno = 100,
   maxstepno = 100, nu = 0.1, cv = TRUE, multicore = FALSE, ...)
 }
 \arguments{
-\item{data}{A data.frame containing observation times AND status}
+\item{data}{A data.frame containing observation times AND status (Coding: 0=Censored, 1=Interesting risk, >1=Other risks)}
 
 \item{xmat}{A numeric matrix containing the covariate values for all patients.}
 
@@ -28,6 +28,9 @@
 An object of type PseudoBoost containing the estimates and the performed boosting step number.
 }
 \description{
-Takes in eather the data, xmat, times, stepno ....
+This function performs stagewise pseudo-value regression with the help of boosting for the CIF of the interesting risk.
+The data frame must contain the observation times and statuses.
+Thereby the statuses in the data frame should be natrual numbers and coded as follows: (0=Censored, 1=Interesting risk, >1=Other risks).
+Additonally you have to put in the following arguments.
 }
 

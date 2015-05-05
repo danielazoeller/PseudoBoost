@@ -78,7 +78,7 @@ smoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
       return(CIF)
     }
     
-     time_smooth <- matrix(rep(obs.time,n*RepSmooth),n,RepSmooth)
+    time_smooth <- matrix(rep(obs.time,n*RepSmooth),n,RepSmooth)
     value <- matrix(rep(0,n*RepSmooth),n,RepSmooth)
     
     cause_1 <- which(status==1)
@@ -123,7 +123,7 @@ smoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,n
       
       q=cif_delta_i * p
       
-      value[i,] <- cif_max * rbeta(20,p,q)
+      value[i,] <- cif_max * rbeta(RepSmooth,p,q)
       #mehrere Varianten zur Bestimmung der Zeit mit dieser CIF: 
       #1. Bereich mit letzte CIF<berechnete oder erste CIF>=berechnete
       #2. Start oder Stop-Zeit dieses Bereichs
@@ -319,4 +319,113 @@ plot.smoothPseudoBoost <- function(object,est,comb=TRUE,trans=TRUE,name="results
   }  
   dev.off()
   
+}
+
+
+#' Calculates predicted linear predictor or response (CIF) based on smoothPseudoBoost-Object
+#' 
+#' @param object A cbSmoothPseudoBoost-object
+#' @param newdata A n.new * p matrix with new covariate values.
+#' @param subset An optional vecotr specifying a subset of observations to be used for evaluation
+#' @param times A vector with T time points where prediction is wanted.
+#' @param type Type of prediction to be returned: "lp" gives the linear predictor, "response" the resulting CIF.
+#' @export 
+predict.smoothPseudoBoost <- function(object,newdata,subset=NULL,times=NULL,type = c("lp","response")) {
+  type <- match.arg(type)
+  
+  if(is.null(times)){
+    object$times <- object$evaluationTimes
+  } else{
+    object$times <- times
+  }
+  
+  
+  if(!is.null(ncol(newdata))){
+    stopper <- ncol(newdata)+1
+  } else stopper <- length(newdata)+1
+  object$coefficients <- list(object[[1]])
+  for(i in 2:stopper){
+    object$coefficients[[1]] <- cbind(object$coefficients[[1]],object[[i]])
+  }
+  
+  
+  
+  if (!is.null(times) && is.null(object$times)) stop("'times' missing, and no default available")
+  
+  if (is.null(subset)) {
+    subset.index <- 1:nrow(newdata)
+  } else {
+    subset.index <- (1:nrow(newdata))[subset]
+  }
+  
+  #   fit obtained from formula interface
+  if (!is.null(object$terms)) {    
+    newdata <- model.matrix(object$terms, data = model.frame(object$formula, data = newdata))
+  } else {
+    newdata <- cbind(rep(1,nrow(newdata)),newdata)
+  }
+  
+  
+  linear.predictor <- lapply(object$coefficients,function(arg) tcrossprod(newdata,arg))
+  
+  
+  #   interpolation
+  if (!is.null(times)) {
+    eval.index <- unlist(lapply(ifelse(times < min(object$times),min(object$times),times),
+                                function(arg) rev(which(object$times <= arg))[1]))    
+    linear.predictor <- lapply(linear.predictor,function(arg) arg[,eval.index,drop=FALSE])
+  }
+  
+  if (type == "response") {
+    if (length(linear.predictor) == 1) {
+      #return(1/(1+exp(-linear.predictor[[1]])))
+      return(exp(linear.predictor[[1]]))
+    } else {
+      return(lapply(linear.predictor,function(arg) 1/(1+exp(-arg))))
+    }
+  }
+  
+  if (length(linear.predictor) == 1) {
+    return(linear.predictor[[1]])
+  }
+  
+  linear.predictor
+}
+
+
+#' Calculates predicted response (CIF) based on smoothPseudoBoost-Object
+#' 
+#' @param object A smoothPseudoBoost-object
+#' @param newdata A n.new * p matrix with new covariate values.
+#' @param subset An optional vecotr specifying a subset of observations to be used for evaluation
+#' @param times A vector with T time points where prediction is wanted.
+#' @export 
+predictProb.smoothPseudoBoost <- function (object,newdata,subset=NULL,times=NULL) {
+  
+  
+  if(is.null(times)){
+    object$times <- object$evaluationTimes
+  } else{
+    object$times <- times
+  }
+  
+  if(!is.null(ncol(newdata))){
+    stopper <- ncol(newdata)+1
+  } else stopper <- length(newdata)+1
+  object$coefficients <- list(object[[1]])
+  for(i in 2:stopper){
+    object$coefficients[[1]] <- cbind(object$coefficients[[1]],object[[i]])
+  }
+  
+
+  
+  if (!is.null(times) && is.null(object$times)) stop("'times' missing, and no default available")
+  
+  if (is.null(subset)) {
+    subset.index <- 1:nrow(newdata)
+  } else {
+    subset.index <- (1:nrow(newdata))[subset]
+  }
+  
+  predict(object,newdata=newdata,type="response")
 }

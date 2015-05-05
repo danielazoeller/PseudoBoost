@@ -20,7 +20,7 @@
 #' @param RepCb A numeric value indicating the number of Resampling data sets (=100)
 #' @param alpha A numeric value between 0 and 1 indicating the type 1 error (=0.05)
 #' @param cv_est A boolean value indicating if cross validation should be performed for the estimates seperately (=TRUE)
-#' @return An object of type ciMeanPseudoBoost containing the estimates and the performed boosting step number.
+#' @return An object of type cbMeanPseudoBoost containing the estimates and the performed boosting step number.
 #' @export 
 
 cbMeanPseudoBoost <- function(object,...){
@@ -49,7 +49,7 @@ cbMeanPseudoBoost <- function(object,...){
 #' @param RepCb A numeric value indicating the number of Resampling data sets (=100)
 #' @param alpha A numeric value between 0 and 1 indicating the type 1 error (=0.05)
 #' @param cv_est A boolean value indicating if cross validation should be performed for the estimates seperately (=TRUE)
-#' @return An object of type ciMeanPseudoBoost containing the estimates and the performed boosting step number.
+#' @return An object of type cbMeanPseudoBoost containing the estimates and the performed boosting step number.
 #' @export 
 cbMeanPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100,nu=0.1,cv=TRUE,multicore=FALSE,RepMean=50,switch.to=150,switch.t=NULL,seed.start=NULL,trace=TRUE,switches=NULL,part=0.632,RepCb=100,alpha=0.05,cv_est=TRUE,step.point=0.001,...){
   

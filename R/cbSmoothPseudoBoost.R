@@ -109,7 +109,7 @@ cbSmoothPseudoBoost.default <- function(data,xmat,times,stepno=100,maxstepno=100
   
   for(j in 1:RepCb){
     cat("\nResample: ",j,"\n")
-    set.seed(seed.start + (j+1)*RepSmooth*2005)
+    set.seed(seed.start + (j+1)*max(RepSmooth,1)*2005)
     seed.start.Mean <- round(runif(1,0,54648721))
     
     choice <- sample(sub,nsub,replace=FALSE)
@@ -379,4 +379,110 @@ plot.cbSmoothPseudoBoost <- function(object,est, ci,alpha=0.05,trans=TRUE,name="
   }  
   dev.off()
   
+}
+
+#' Calculates predicted linear predictor or response (CIF) based on cbSmoothPseudoBoost-Object
+#' 
+#' @param object A cbSmoothPseudoBoost-object
+#' @param newdata A n.new * p matrix with new covariate values.
+#' @param subset An optional vecotr specifying a subset of observations to be used for evaluation
+#' @param times A vector with T time points where prediction is wanted.
+#' @param type Type of prediction to be returned: "lp" gives the linear predictor, "response" the resulting CIF.
+#' @export 
+predict.cbSmoothPseudoBoost <- function(object,newdata,subset=NULL,times=NULL,type = c("lp","response")) {
+  type <- match.arg(type)
+  
+  if(is.null(times)){
+    object$times <- object$evaluation.times
+  } else{
+    object$times <- times
+  }
+  
+  if(!is.null(ncol(newdata))){
+    stopper <- ncol(newdata)+1
+  } else stopper <- length(newdata)+1
+  object$coefficients <- list(object[[1]][,1])
+  for(i in 2:stopper){
+    object$coefficients[[1]] <- cbind(object$coefficients[[1]],object[[i]][,1])
+  }
+
+  
+  if (!is.null(times) && is.null(object$times)) stop("'times' missing, and no default available")
+  
+  if (is.null(subset)) {
+    subset.index <- 1:nrow(newdata)
+  } else {
+    subset.index <- (1:nrow(newdata))[subset]
+  }
+  
+  #   fit obtained from formula interface
+  if (!is.null(object$terms)) {    
+    newdata <- model.matrix(object$terms, data = model.frame(object$formula, data = newdata))
+  } else {
+    newdata <- cbind(rep(1,nrow(newdata)),newdata)
+  }
+  
+  
+  linear.predictor <- lapply(object$coefficients,function(arg) tcrossprod(newdata,arg))
+  
+  
+  #   interpolation
+  if (!is.null(times)) {
+    eval.index <- unlist(lapply(ifelse(times < min(object$times),min(object$times),times),
+                                function(arg) rev(which(object$times <= arg))[1]))    
+    linear.predictor <- lapply(linear.predictor,function(arg) arg[,eval.index,drop=FALSE])
+  }
+  
+  if (type == "response") {
+    if (length(linear.predictor) == 1) {
+      #return(1/(1+exp(-linear.predictor[[1]])))
+      return(exp(linear.predictor[[1]]))
+    } else {
+      return(lapply(linear.predictor,function(arg) 1/(1+exp(-arg))))
+    }
+  }
+  
+  if (length(linear.predictor) == 1) {
+    return(linear.predictor[[1]])
+  }
+  
+  linear.predictor
+}
+
+
+#' Calculates predicted response (CIF) based on cbSmoothPseudoBoost-Object
+#' 
+#' @param object A cbSmoothPseudoBoost-object
+#' @param newdata A n.new * p matrix with new covariate values.
+#' @param subset An optional vecotr specifying a subset of observations to be used for evaluation
+#' @param times A vector with T time points where prediction is wanted.
+#' @export 
+predictProb.cbSmoothPseudoBoost <- function (object,newdata,subset=NULL,times=NULL) {
+  
+  
+  if(is.null(times)){
+    object$times <- object$evaluation.times
+  } else{
+    object$times <- times
+  }
+  
+  if(!is.null(ncol(newdata))){
+    stopper <- ncol(newdata)+1
+  } else stopper <- length(newdata)+1
+  object$coefficients <- list(object[[1]][,1])
+  for(i in 2:stopper){
+    object$coefficients[[1]] <- cbind(object$coefficients[[1]],object[[i]][,1])
+  }
+  
+  
+  
+  if (!is.null(times) && is.null(object$times)) stop("'times' missing, and no default available")
+  
+  if (is.null(subset)) {
+    subset.index <- 1:nrow(newdata)
+  } else {
+    subset.index <- (1:nrow(newdata))[subset]
+  }
+  
+  predict(object,newdata=newdata,type="response")
 }

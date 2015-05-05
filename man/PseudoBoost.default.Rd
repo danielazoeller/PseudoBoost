@@ -28,6 +28,9 @@
 An object of type PseudoBoost containing the estimates and the performed boosting step number.
 }
 \description{
-Takes in eather the data, xmat, times, stepno ....
+This function performs stagewise pseudo-value regression with the help of boosting for the CIF of the interesting risk.
+The ymat a numeric matrix containing the pseudo-values for the CIF for the interesting risk obtained with the help of the package "prodlim" (jackknife(prodlim(Hist(observation-times-vector,status-vector) ~ 1), times=evaluation-times-vector, cause=interesting-risk-number)).
+Thereby the statuses in the data frame should be natrual numbers and coded as follows: (0=Censored, 1=Interesting risk, >1=Other risks).
+Additonally you have to put in the following arguments.
 }
 
