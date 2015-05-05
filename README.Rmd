@@ -1,9 +1,4 @@
----
-title: "PseudoBoost"
-author: "Daniela Zöller"
-date: "Tuesday, May 05, 2015"
-output: html_document
----
+# PseudoBoost
 
 In a competing risk setting the CIF for the interesting risk can be
 calculated at a grid of time. For this values a stagewise boosting
