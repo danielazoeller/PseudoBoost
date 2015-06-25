@@ -12,7 +12,7 @@ To install the development version for the package PseudoBoost, please start a c
 ```{r,eval=FALSE}
 # currently this can be done via github
 install.packages("devtools") #if needed
-devtool::install_github("danielazoeller/PseudoBoost")
+devtools::install_github("danielazoeller/PseudoBoost")
 ```
 
 
